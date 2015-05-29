@@ -105,6 +105,16 @@ var proxy_map = {
       ctx.events.emit('no_body');
     });
   },
+  307: function(result, ctx) {
+    fs.writeFile(ctx.directory + "/307", result.headers.location, function(err) {
+      if (err) {
+        log.error(ctx.from + "Unable to write file " + ctx.directory + "/301 : " + err);
+        ctx.events.emit('error');
+        return;
+      }
+      ctx.events.emit('no_body');
+    });
+  },
   404: function(result, ctx) {
     fs.writeFile(ctx.directory + "/404", "", function(err) {
       if (err) {
@@ -166,6 +176,7 @@ function copyHeadersIfExists(headers, from_headers, callback) {
   headers.forEach(function(h) {
     var hh = from_headers[h.toLowerCase()];
     if (hh) {
+      log.debug("copied header " + hh);
       callback(h, hh);
     }
   });
@@ -347,6 +358,7 @@ function run_proxy_request(ctx) {
         'Content-length',
         ], ctx.headers, function(k, v) {ctx.parsed_url.headers[k] = v;});
     }
+
     var proxy_req = http.request(ctx.parsed_url, function(result) {
       var f = proxy_map[result.statusCode];
       if (!f) {
@@ -402,6 +414,9 @@ var process_map = {
     send_redirect(response, 301, filename);
   },
   302: function(response, headers, filename, stats) {
+    send_redirect(response, 302, filename);
+  },
+  307: function(response, headers, filename, stats) {
     send_redirect(response, 302, filename);
   },
   404: function(response, headers, filename, stats) {
