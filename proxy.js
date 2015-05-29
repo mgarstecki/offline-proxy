@@ -329,9 +329,15 @@ function run_proxy_request(ctx) {
       ctx.parsed_url.hostname = http_proxy.hostname;
       ctx.parsed_url.port = http_proxy.port;
     }
+
+    ctx.parsed_url.headers = {};
+
+    copyHeadersIfExists([
+      'Authorization',
+      ], ctx.headers, function(k, v) {ctx.parsed_url.headers[k] = v;});
+
     if (ctx.body_chunks) {
       ctx.parsed_url.method = 'POST';
-      ctx.parsed_url.headers = {};
       copyHeadersIfExists([
         'Content-Type',
         'Accept',
