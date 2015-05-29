@@ -108,7 +108,7 @@ var proxy_map = {
   307: function(result, ctx) {
     fs.writeFile(ctx.directory + "/307", result.headers.location, function(err) {
       if (err) {
-        log.error(ctx.from + "Unable to write file " + ctx.directory + "/301 : " + err);
+        log.error(ctx.from + "Unable to write file " + ctx.directory + "/307 : " + err);
         ctx.events.emit('error');
         return;
       }
